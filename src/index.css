@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .card {
+        @apply bg-white rounded-lg p-6 shadow-xl;
+    }
+    
+    .tab {
+        @apply px-3 py-1 text-lg;
+        /* font-size: theme('fontSize'); */
+    }
+
+    .active-tab {
+        @apply bg-gray-300;
+    }
+
+    .tab-bar {
+        @apply border-b-2;
+    }
+
+    .tab-bar :hover {
+        background-color: theme('colors.blue.200')
+    }
+}

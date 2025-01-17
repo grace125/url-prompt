@@ -26,6 +26,8 @@
   },
 
   "permissions": [
+    "tabs",
+    "bookmarks",
     "storage"
   ],
 

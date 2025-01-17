@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-        "strict": true,
         "target": "es6",
         "moduleResolution": "bundler",
         "module": "ES6",
@@ -10,6 +9,12 @@
         "outDir": "dist/js",
         "noEmitOnError": true,
         "jsx": "react",
-        "typeRoots": [ "node_modules/@types" ]
+        "typeRoots": [ "node_modules/@types" ],
+        "allowJs": false,
+
+        "noUncheckedIndexedAccess": true,
+        // "noUncheckedSideEffectImports": true,
+        "noImplicitOverride": true,
+        "strict": true,
     }
 }
