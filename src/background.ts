@@ -38,7 +38,7 @@ chrome.runtime.onMessage.addListener((message: Message.Background, sender, sendR
             runningState.tap(({ intervalId }) => {
                 clearInterval(intervalId)
             })
-            const intervalId = timer(message.ruleset.timerDuration, message.ruleset.reps, true, () => {
+            const intervalId = timer(message.ruleset.duration, message.ruleset.reps, true, () => {
                 for (const action of message.ruleset.actions) {
 
                     Chrome.Bookmarks.search(bookmarkTree, action.path).match({

@@ -1,40 +1,32 @@
-export const redirectMethods = ["tab-group", "window", "separate"] as const
-export const redirectMethodText: { [key in RedirectMethod]: string } = {
-    "tab-group": "Tab Group",
-    window: "New Window",
-    separate: "Separate Windows"
-}
-export type RedirectMethod = typeof redirectMethods[number]
+import { z } from "zod"
 
-export type Ruleset = { 
-    name: string
-    timerDuration: number
-    reps: number
-    redirectMethod: RedirectMethod
-    actions: Action[]
-}
+export type Action = z.infer<typeof Action>
+export type Ruleset = z.infer<typeof Ruleset>
 
-export type Action = {
-    path: string
-    recursive: boolean
-    avoidRepetitions: boolean
-}
+export const Action = z.object({
+    path: z.string(),
+    recursive: z.boolean(),
+})
+
+export const Ruleset = z.object({
+    name: z.string(),
+    duration: z.number().min(1000),
+    reps: z.number().min(1).max(30),
+    actions: z.array(Action)
+})
 
 export const DEFAULT_ACTION: Action = {
     path: "",
     recursive: true,
-    avoidRepetitions: true
 }
 
 export const DEFAULT_RULESET: Ruleset = {
     name: "",
-    timerDuration: 30000,
+    duration: 30000,
     reps: 1,
-    redirectMethod: "separate",
     actions: []
 }
 
-// TODO: use zod
 export const update = (rulesets: Ruleset[], callback?: () => void) => {
     chrome.storage.sync.set({ rulesets: JSON.stringify(rulesets) }, callback)
 }

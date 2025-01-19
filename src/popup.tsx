@@ -21,7 +21,7 @@ const RuleUser = () => {
 
   return <div>
     { bg.state.case === "running" ? <>
-      <Ui.Timer repeating={true} start={bg.state.timestamp} length={bg.state.ruleset.timerDuration} />
+      <Ui.Timer repeating={true} start={bg.state.timestamp} length={bg.state.ruleset.duration} />
       <button onClick={() => bg.send({ case: "stop" })}>stop</button>
       <br/>
     </> : null }
@@ -77,20 +77,11 @@ const RuleEditor = () => {
             <input
               id="duration"
               type="number"
-              value={ruleset.timerDuration}
+              value={ruleset.duration}
               min="1000"
-              onInput={(event) => setRuleset({ timerDuration: event.currentTarget.valueAsNumber })}
+              onInput={(event) => setRuleset({ duration: event.currentTarget.valueAsNumber })}
             >
             </input>
-            <br/>
-            <label htmlFor="redirect-method">Url Open Method:</label>
-            <select 
-              id="redirect-method"
-              value={ruleset.redirectMethod}
-              onChange={(event) => setRuleset({ redirectMethod: event.currentTarget.value as Ruleset.RedirectMethod})}
-            >
-              {Ruleset.redirectMethods.map(method => <option key={method} value={method}>{Ruleset.redirectMethodText[method]}</option>)}
-            </select>
             <br/>
             Actions:
             <br/>
@@ -108,14 +99,6 @@ const RuleEditor = () => {
                   type="checkbox"
                   checked={action.recursive}
                   onChange={(event) => setAction({ recursive: event.currentTarget.checked })}
-                />
-                <br/>
-                <label htmlFor="avoid-repetitions">Avoid Repetitions:</label>
-                <input
-                  id="avoid-repetitions"
-                  type="checkbox"
-                  checked={action.avoidRepetitions}
-                  onChange={(event) => setAction({ avoidRepetitions: event.currentTarget.checked })}
                 />
                 <br/>
               </div>

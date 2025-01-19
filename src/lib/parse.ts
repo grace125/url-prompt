@@ -14,6 +14,13 @@ export const parse = <Output, Def extends ZodTypeDef, Input>(
     }
 }
 
+export const literalSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
+export type JsonLiteral = z.infer<typeof literalSchema>;
+export type Json = JsonLiteral | { [key: string]: Json } | Json[];
+export const jsonSchema: z.ZodType<Json> = z.lazy(() =>
+  z.union([literalSchema, z.array(jsonSchema), z.record(jsonSchema)])
+);
+
 export const stringToNumber = z.string().transform((s, ctx) => {
   const parsed = parseInt(s);
   if (isNaN(parsed)) {
