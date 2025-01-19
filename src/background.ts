@@ -1,4 +1,4 @@
-import * as U from "./util"
+import { Message, Ruleset } from "./util"
 import { Option, Arr } from "./lib"
 import * as Chrome from "./chrome"
 
@@ -26,16 +26,15 @@ chrome.bookmarks.onChanged.addListener(() => {
 })
 
 let runningState = Option.none<{ 
-    ruleset: U.Ruleset.Ruleset
+    ruleset: Ruleset.Ruleset
     timestamp: number
     intervalId: NodeJS.Timer
 }>()
 
-chrome.runtime.onMessage.addListener((untypedMessage, sender, sendResponse) => {
-    const message: U.Message.Background = untypedMessage
-    
+chrome.runtime.onMessage.addListener((message: Message.Background, sender, sendResponse: (c: Message.BackgroundState) => void) => {
     switch (message.case) {
         case "start": {
+            console.log("start!", runningState)
             runningState.tap(({ intervalId }) => {
                 clearInterval(intervalId)
             })
@@ -62,13 +61,28 @@ chrome.runtime.onMessage.addListener((untypedMessage, sender, sendResponse) => {
                 timestamp: Date.now(),
                 intervalId: intervalId 
             })
+            sendResponse({
+                case: "running",
+                ruleset: message.ruleset,
+                timestamp: Date.now()
+            })
             break
         }
         case "stop": {
+            console.log("stop!", runningState)
             runningState.tap(({ intervalId }) => { 
                 clearInterval(intervalId) 
             })
             runningState = Option.none()
+            sendResponse({ case: "stopped" })
+            break
+        }
+        case "query": {
+            console.log("query (bg)!", runningState)
+            sendResponse(runningState.match({
+                some: state => ({ case: "running", ruleset: state.ruleset, timestamp: state.timestamp }),
+                none: () => ({ case: "stopped" })
+            }))
             break
         }
         default: message satisfies never

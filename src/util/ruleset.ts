@@ -1,5 +1,3 @@
-import { dbg } from "../lib"
-
 export const redirectMethods = ["tab-group", "window", "separate"] as const
 export const redirectMethodText: { [key in RedirectMethod]: string } = {
     "tab-group": "Tab Group",
@@ -38,7 +36,7 @@ export const DEFAULT_RULESET: Ruleset = {
 
 // TODO: use zod
 export const update = (rulesets: Ruleset[], callback?: () => void) => {
-    chrome.storage.sync.set({ rulesets: dbg(JSON.stringify(rulesets)) }, callback)
+    chrome.storage.sync.set({ rulesets: JSON.stringify(rulesets) }, callback)
 }
 
 export const fetch = (callback: (rulesets: Ruleset[]) => void) => {

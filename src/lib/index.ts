@@ -3,6 +3,7 @@ export * from "./result"
 export * as Arr from "./array"
 export * as Obj from "./object"
 export * as Parse from "./parse"
+export * as M from "./math"
 
 export const dbg = <T>(t: T) => {
 	console.log(t)

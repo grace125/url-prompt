@@ -11,7 +11,7 @@ export const Tabs = (props: { tabs: L.Arr.NonEmptyArray<Tab> }) => {
     const [tabId, setTab] = useState(props.tabs[0]?.key);
     
     return <div className="tabs">
-        <div className="tab-bar" onClick={(event) => console.log(event)}>
+        <div className="tab-bar">
             {props.tabs.map(tab => <button key={tab.key} className={tab.key === tabId ? "tab active-tab" : "tab"} onClick={() => setTab(tab.key)}>{tab.name}</button>)}
         </div>
         <div className="tab-content">

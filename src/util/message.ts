@@ -1,13 +1,31 @@
+import { useEffect, useState } from "react";
 import { Ruleset } from "./ruleset";
 
 export type Background = 
-    { case: "start", ruleset: Ruleset } |
-    { case: "stop" }
+    | { case: "start", ruleset: Ruleset }
+    | { case: "stop" }
+    | { case: "query" }
 
-export type Content = never
+export type BackgroundState = 
+    | { case: "running", ruleset: Ruleset, timestamp: number }
+    | { case: "stopped" }
 
-const typedOnMessageAddListener: <Receive, Send>(callback: (message: Receive, sender: chrome.runtime.MessageSender, sendResponse: (response: Send) => void) => void) => void = chrome.runtime.onMessage.addListener
+export const useBackground = () => {
+  const [background, setBackground] = useState<BackgroundState>({ case: "stopped" })
 
-export const addContentListener = typedOnMessageAddListener<Content, Background>
-export const sendContent = chrome.tabs.sendMessage<Content, Background>
-export const sendBackground = chrome.runtime.sendMessage<Background, Content>
+  useEffect(() => {
+    chrome.runtime.sendMessage<Background, BackgroundState>({ case: "query" }, (msg) => {
+      console.log("set background")
+      setBackground(msg)
+    })
+  }, [])
+
+  const send = (message: Background) => {
+    chrome.runtime.sendMessage<Background, BackgroundState>(
+      message, 
+      (response) => setBackground(response)
+    )
+  }
+
+  return { state: background, send }
+}

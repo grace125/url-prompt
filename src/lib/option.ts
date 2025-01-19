@@ -14,5 +14,5 @@ export class Option<T> {
     unwrapOr = (backup: T) => "some" in this.variant ? this.variant.some : backup
     unwrapOrElse = (backup: () => T) => "some" in this.variant ? this.variant.some : backup()
     tap = (tapper: (t: T) => void) => "some" in this.variant && tapper(this.variant.some)
-    match = <U>(cases: { some: (t: T) => U, none: () => U}): U => "some" in this.variant ? cases.some(this.variant.some) : cases.none()
+    match = <U1, U2>(cases: { some: (t: T) => U1, none: () => U2}): U1 | U2 => "some" in this.variant ? cases.some(this.variant.some) : cases.none()
 }

@@ -6,13 +6,13 @@ export const useChromeBookmarkTree = () => {
 
     useEffect(() => {
         chrome.bookmarks.getTree().then(tree => setTree(tree))
-    })
+    }, [])
 
     useEffect(() => {
         chrome.bookmarks.onChanged.addListener(() => {
             chrome.bookmarks.getTree().then(tree => setTree(tree))
         })
-    })
+    }, [])
 
     return tree
 }
@@ -43,7 +43,6 @@ export const search = (
 ): Result<chrome.bookmarks.BookmarkTreeNode, SearchBookmarkTreeError> => {
     const parsePath = path.split("/").filter(s => s.length > 0)
     const actualTree = Arr.lengthEquals(1)(tree) && tree[0].title === "" ? tree[0].children ?? [] : tree
-    console.log(actualTree, parsePath)
     return Arr.nonEmpty(parsePath) ? _searchBookmarkTree(actualTree, [], parsePath) : Result.err({ case: "empty-path" }) 
 }
 
