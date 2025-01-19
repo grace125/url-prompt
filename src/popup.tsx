@@ -1,7 +1,7 @@
 import "./index.css"
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Result, Parse, Arr, Obj } from "./lib";
+import { Result, Parse, Arr, Obj, dbg } from "./lib";
 import { Message, Ruleset } from "./util";
 import * as Ui from "./ui";
 import "./index.css"
@@ -20,18 +20,18 @@ const RuleUser = () => {
   }, []);
 
   return <div>
-    { bg.state.case === "running" ? <>
-      <Ui.Timer repeating={true} start={bg.state.timestamp} length={bg.state.ruleset.duration} />
-      <button onClick={() => bg.send({ case: "stop" })}>stop</button>
-      <br/>
-    </> : null }
-    {rulesets.map(ruleset => <>
-        <button key={ruleset.name} onClick={() => bg.send({ case: "start", ruleset })}>{ruleset.name}</button>
-        <hr/>
-      </>
-    )}
-    <br/>
-    <button onClick={() => chrome.runtime.openOptionsPage()}>rules</button>
+    { bg.state.case === "running" ? <div className="flex flex-col flex-center">
+      <Ui.Card className="float-right bg-blue-400">
+        <Ui.Timer repeating={true} start={bg.state.timestamp} length={bg.state.ruleset.duration} />
+      </Ui.Card>
+      <button className="float-right rounded-md bg-red-400 hocus:bg-black-400 py-1 px-2" onClick={() => bg.send({ case: "stop" })}>stop</button>
+    </div> : <>
+      {rulesets.map(ruleset => <>
+          <button key={ruleset.name} onClick={() => bg.send({ case: "start", ruleset })}>{ruleset.name}</button>
+          <hr/>
+        </>
+      )}
+    </> }
   </div>
 }
 
@@ -56,64 +56,55 @@ const RuleEditor = () => {
   };
 
   return (
-    <>
+    <div className="space-y-3 m-2">
       {rulesets.map((ruleset, i) => {
         const setRuleset = (edit: Partial<Ruleset.Ruleset> ) => replaceRuleset(i, Obj.copyWith(ruleset, edit))
         const pushAction = (action: Ruleset.Action) => setRuleset({ actions: [...ruleset.actions, action] })
-        return <div key={i}>
+        return <Ui.Card className="p-3 bg-slate-200" key={i}>
           <div>
-            <Ui.TextInput<string> validate={Result.ok} id="name" value={ruleset.name} label="Name:" onValidInput={name => setRuleset({ name })} />
-            <button onClick={() => deleteRuleset(i)}>- Delete</button>
-            <br/>
-            <Ui.TextInput<number> 
-              validate={s => Parse.parse(Parse.stringToNumber.refine(n => 1 <= n && n <= 30, "number should be between 1 and 30"), s)}
-              id="reps"
-              value={ruleset.reps}
-              label="Repetitions:"
-              onValidInput={reps => setRuleset({ reps })}
+            <button className="float-right" onClick={() => deleteRuleset(i)}>- Delete</button>
+            <Ui.TextInput<string> 
+              className="mb-3"
+              validate={Result.ok} id="name" value={ruleset.name} label="Name:" onValidInput={name => setRuleset({ name })} 
             />
-            <br/>
-            <label htmlFor="duration">Timer Duration:</label>
-            <input
-              id="duration"
-              type="number"
-              value={ruleset.duration}
-              min="1000"
-              onInput={(event) => setRuleset({ duration: event.currentTarget.valueAsNumber })}
-            >
-            </input>
-            <br/>
-            Actions:
-            <br/>
+            <div className="grid grid-cols-2 gap-4 mb-3">
+              <div><Ui.TextInput<number> 
+                className="max-w-40"
+                validate={s => Parse.parse(Parse.stringToNumber.refine(n => 1 <= n && n <= 30, "number should be between 1 and 30"), s)}
+                id="reps" value={ruleset.reps} 
+                label="Repetitions:"
+                onValidInput={reps => setRuleset({ reps })}
+              /></div>
+              <div><Ui.TextInput<number> 
+                className="max-w-40"
+                validate={s => Parse.parse(Parse.stringToNumber.refine(n => 1000 <= n, "duration should be at least 1 second long"), s)}
+                id="duration"
+                value={ruleset.duration}
+                label="Timer Duration:"
+                onValidInput={duration => setRuleset({ duration: dbg(duration) })}
+              /></div>
+            </div>
+            <h1>Actions</h1>
             {ruleset.actions.map((action, j) => {
               const setAction = (edit: Partial<Ruleset.Action>) => setRuleset({ actions: Arr.toSpliced(ruleset.actions, j, 1, Obj.copyWith(action, edit)) })
               const deleteAction = () => setRuleset({ actions: Arr.toSpliced(ruleset.actions, j, 1)})
-              return <div key={`${i}-${j}`} className={j % 2 === 0 ? "bg-blue-100" : "bg-blue-200"}>
-                <label htmlFor="path">Path:</label>
-                <input id="path" type="text" value={action.path} onInput={(event) => setAction({ path: event.currentTarget.value })}/>
-                <button onClick={deleteAction}>- Delete</button>
-                <br/>
-                <label htmlFor="recursive-path">Recursive:</label>
-                <input
-                  id="recursive-path"
-                  type="checkbox"
-                  checked={action.recursive}
-                  onChange={(event) => setAction({ recursive: event.currentTarget.checked })}
-                />
-                <br/>
-              </div>
+              return <Ui.Card key={`${i}-${j}`} className={(j % 2 === 0 ? "bg-blue-100" : "bg-blue-200") + " p-3"}>
+                <button onClick={deleteAction} className="float-right">- Delete</button>
+                <Ui.TextInput<string> className="mb-3" validate={Result.ok} id="path" label="Path:" value={action.path} onValidInput={path => setAction({ path })}/>
+                <Ui.Checkbox id="recursive-path" label="Recursive" checked={action.recursive} onChange={recursive => setAction({ recursive })}/>
+              </Ui.Card>
             })}
             <br/>
           </div>
-          <button onClick={() => pushAction(DEFAULT_ACTION)}>+ Action</button>
-          <hr/>
-        </div>
+          <button className="float-right" onClick={() => pushAction(DEFAULT_ACTION)}>+ Action</button>
+          <br/>
+        </Ui.Card>
       })}
-      <button onClick={() => pushRuleset(DEFAULT_RULESET)}>+ Ruleset</button>
-      <br/>
       <div>{status}</div>
       <button onClick={saveOptions}>Save</button>
-    </>
+      <button className="float-right" onClick={() => pushRuleset(DEFAULT_RULESET)}>+ Ruleset</button>
+
+    </div>
   );
 };
 

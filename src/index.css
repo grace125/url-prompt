@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    h1 {
+        @apply text-xl;
+    }
+    h2 {
+        @apply text-lg;
+    }
+}
+
 @layer components {
     .card {
         @apply bg-white rounded-lg p-6 shadow-xl;
@@ -21,6 +30,26 @@
     }
 
     .tab-bar :hover {
-        background-color: theme('colors.blue.200')
+        @apply bg-blue-200;
+    }
+
+    .app-select-label, .app-text-input-label {
+        @apply block mb-0.5 text-xs font-medium text-gray-900;
+    }
+
+    .app-text-input {
+        @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block py-1 px-2;
+    }
+
+    .app-checkbox {
+        @apply w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-blue-300;
+    }
+
+    .app-checkbox-label {
+        @apply ms-2 text-xs font-medium text-gray-900;
+    }
+
+    .app-timer {
+        @apply font-mono text-lg;
     }
 }

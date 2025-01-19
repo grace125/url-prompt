@@ -10,7 +10,7 @@ export const useMillisElapsed = (start: number, poll: number) => {
         clearInterval(intervalId)
         const newIntervalId = setInterval(() => setCurrentTime(Date.now()), poll)
         setIntervalId(newIntervalId)
-    }, [start, poll, intervalId])
+    }, [start, poll])
 
     return currentTime - start
 }
@@ -28,5 +28,7 @@ export const Timer = (p: {
     const minutes = fmtTimerNumber(Math.floor(timeLeft / 60000) % 60)
     const seconds = fmtTimerNumber(Math.floor(timeLeft / 1000) % 60)
 
-    return <div className="font-mono text-lg">{length > 3600000 ? hours + ":" : null }{minutes}:{seconds}</div>
+    return <div className="font-mono text-lg flex justify-center">
+        <div>{length > 3600000 ? hours + ":" : null }{minutes}:{seconds}</div>
+    </div>
 }
